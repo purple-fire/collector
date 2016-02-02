@@ -38,34 +38,55 @@
 
 const int MAX_FLYWHEEL_SPEED = 127;
 const int MAX_PICKUP_SPEED = 127;
+const int MAX_RELEASE_SPEED = -127;
 
-const int LEFT_BACK_DRIVE = 2;
-const int RIGHT_BACK_DRIVE = 4;
-const int LEFT_FRONT_DRIVE = 1;
-const int RIGHT_FRONT_DRIVE = 3;
+const int LEFT_UP_DRIVE = 2;
+const int LEFT_DOWN_DRIVE = 3;
 
-const int PICKUP_BELT = 9;
+const int RIGHT_UP_DRIVE = 4;
+const int RIGHT_DOWN_DRIVE = 5;
+
+const int RIGHT_FLY_BOTTOM = 6;
+const int RIGHT_FLY_TOP = 7;
+const int LEFT_FLY_BOTTOM = 8;
+const int LEFT_FLY_TOP = 9;
+
+const int PICKUP_BELT = 10;
+
+int modFlywheelSpeed;
 
 void operatorControl() {
+	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
 
-	setMotorReversed(RIGHT_FRONT_DRIVE, true);
-	setMotorReversed(LEFT_FRONT_DRIVE, true);
-	setMotorReversed(LEFT_BACK_DRIVE, true);
+	setMotorReversed(LEFT_UP_DRIVE, true);
+	setMotorReversed(LEFT_DOWN_DRIVE, true);
+
+	setMotorReversed(LEFT_FLY_BOTTOM, true);
+	setMotorReversed(RIGHT_FLY_TOP, true);
+
+	setMotorToRamp(LEFT_FLY_TOP, true);
+	setMotorToRamp(LEFT_FLY_BOTTOM, true);
+	setMotorToRamp(RIGHT_FLY_TOP, true);
+	setMotorToRamp(RIGHT_FLY_BOTTOM, true);
 
 	beginRampMotorsTask();
 
 	while (1) {
+		int button5U = joystickGetDigital(1,5,JOY_UP);
 		int button6U = joystickGetDigital(1,6,JOY_UP);
 		int button6D = joystickGetDigital(1,6,JOY_DOWN);
+
+		int button7U = joystickGetDigital(1,7,JOY_UP);
+		int button7D = joystickGetDigital(1,7,JOY_DOWN);
 
 		int leftStick = joystickGetAnalog(1, 3);
 		int rightStick = joystickGetAnalog(1, 2);
 
-		setMotorSpeed(LEFT_BACK_DRIVE, leftStick);
-		setMotorSpeed(LEFT_FRONT_DRIVE, leftStick);
+		setMotorSpeed(LEFT_UP_DRIVE, leftStick);
+		setMotorSpeed(LEFT_DOWN_DRIVE, leftStick);
 
-		setMotorSpeed(RIGHT_BACK_DRIVE, rightStick);
-		setMotorSpeed(RIGHT_FRONT_DRIVE, rightStick);
+		setMotorSpeed(RIGHT_UP_DRIVE, rightStick);
+		setMotorSpeed(RIGHT_DOWN_DRIVE, rightStick);
 
 		if (button6U)
 			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
@@ -73,6 +94,19 @@ void operatorControl() {
 			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
 		else
 			setMotorSpeed(PICKUP_BELT, 0);
+
+		if (button7U)
+			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+		if (button7D)
+			modFlywheelSpeed = 65;
+
+		if(button5U){
+			digitalWrite(1, LOW);
+			rampMotorsUp(modFlywheelSpeed);
+		}
+		else{
+			rampMotorsDown(0);
+		}
 
 		delay(20);
 	}

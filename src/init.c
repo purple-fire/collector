@@ -33,6 +33,7 @@
  */
 
 #include "main.h"
+#include <API.h>
 
 Encoder LFlywheel;
 Encoder RFlywheel;
@@ -45,12 +46,12 @@ Encoder RFlywheel;
  * states (digitalWrite()) of limit switches, push buttons, and solenoids. It can also safely
  * configure a UART port (usartOpen()) but cannot set up an LCD (lcdInit()).
  */
-void initializeIO() {
-	pinMode(1, INPUT);
+//void initializeIO() {
+	/*pinMode(1, INPUT);
 	pinMode(2, INPUT);
 	pinMode(3, INPUT);
-	pinMode(4, INPUT);
-}
+	pinMode(4, INPUT);*/
+//}
 
 /*
  * Runs user initialization code. This function will be started in its own task with the default
@@ -65,7 +66,7 @@ void initializeIO() {
  * will not start. An autonomous mode selection menu like the pre_auton() in other environments
  * can be implemented in this task if desired.
  */
-void initialize() {
-	LFlywheel = encoderInit(5,6,false);
-	RFlywheel = encoderInit(7,8,false);
-}
+//void initialize() {
+	/*LFlywheel = encoderInit(5,6,false);
+	RFlywheel = encoderInit(7,8,false);*/
+//}

@@ -32,8 +32,7 @@
  * obtained from http://sourceforge.net/projects/freertos/files/ or on request.
  */
 
-//#include "main.h"
-#include "init.c"
+#include "main.h"
 #include "motorControl.c"
 #include <Math.h>
 #include "encoderTask.c"
@@ -56,10 +55,28 @@ const int LEFT_FLY_TOP = 9;
 const int PICKUP_BELT = 10;
 
 int modFlywheelSpeed;
+Encoder LFlywheel;
+Encoder RFlywheel;
 
+void initializeIO() {
+	pinMode(1, INPUT);
+	pinMode(2, INPUT);
+	pinMode(3, INPUT);
+	pinMode(4, INPUT);
+}
+
+void initialize() {
+	LFlywheel = encoderInit(5,6,false);
+	RFlywheel = encoderInit(7,8,true);
+}
 
 
 // Debug mode for testing the accuracy of the encoders and their values
+/* NOTE:
+ * Flywheel speed for motors at 127 power reads ~1000 to 1100 / 100ms
+ * At 65 flywheels spin at ~ 500 to 600 / 100ms
+ * At 32 flywheels spin at ~ 200 for right flywheel and 400 for left flywheel
+ */
 void debugMode(){
 	bool switch3 = false;
 	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
@@ -84,8 +101,9 @@ void debugMode(){
 	while (1) {
 		if (digitalRead(1) == LOW)
 			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+
 		if (digitalRead(2) == LOW)
-			modFlywheelSpeed = 65;
+			modFlywheelSpeed = 65/2;
 
 		// Flipping the value of switch bool
 		if(digitalRead(3) == LOW)
@@ -97,8 +115,8 @@ void debugMode(){
 		else
 			rampMotorsDown(0);
 
-		printf("%d \n", encoderGet(LFlywheel));
-		printf("%d \n", encoderGet(RFlywheel));
+		printf("\n%d", encoderGet(LFlywheel));
+		printf("\n%d", encoderGet(RFlywheel));
 
 		delay(20);
 	}
@@ -164,6 +182,6 @@ void opMode(){
 
 void operatorControl() {
 	//debugMode();
-	//opMode();
+	opMode();
 }
 

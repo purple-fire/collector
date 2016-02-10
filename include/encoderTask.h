@@ -8,9 +8,6 @@
 #ifndef ENCODERTASK_H_
 #define ENCODERTASK_H_
 
-
-
-#endif /* ENCODERTASK_H_ */
 #include <API.h>
 
 Encoder encoders[4];
@@ -20,3 +17,4 @@ void beginEncoderResetTask();
 
 TaskHandle encoderResetTask;
 
+#endif /* ENCODERTASK_H_ */

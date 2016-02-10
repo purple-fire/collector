@@ -50,6 +50,11 @@
 extern "C" {
 #endif
 
+
+void debugMode();
+
+void opMode();
+
 // A function prototype looks exactly like its declaration, but with a semicolon instead of
 // actual code. If a function does not match a prototype, compile errors will occur.
 
@@ -111,6 +116,7 @@ void initialize();
  * This task should never exit; it should end with some kind of infinite loop, even if empty.
  */
 void operatorControl();
+
 
 // End C++ export structure
 #ifdef __cplusplus

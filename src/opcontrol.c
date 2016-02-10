@@ -32,9 +32,11 @@
  * obtained from http://sourceforge.net/projects/freertos/files/ or on request.
  */
 
-#include "main.h"
+//#include "main.h"
+#include "init.c"
 #include "motorControl.c"
 #include <Math.h>
+#include "encoderTask.c"
 
 const int MAX_FLYWHEEL_SPEED = 127;
 const int MAX_PICKUP_SPEED = 127;
@@ -55,7 +57,55 @@ const int PICKUP_BELT = 10;
 
 int modFlywheelSpeed;
 
-void operatorControl() {
+
+
+// Debug mode for testing the accuracy of the encoders and their values
+void debugMode(){
+	bool switch3 = false;
+	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+
+	setMotorReversed(LEFT_UP_DRIVE, true);
+	setMotorReversed(LEFT_DOWN_DRIVE, true);
+
+	setMotorReversed(LEFT_FLY_BOTTOM, true);
+	setMotorReversed(RIGHT_FLY_TOP, true);
+
+	setMotorToRamp(LEFT_FLY_TOP, true);
+	setMotorToRamp(LEFT_FLY_BOTTOM, true);
+	setMotorToRamp(RIGHT_FLY_TOP, true);
+	setMotorToRamp(RIGHT_FLY_BOTTOM, true);
+
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
+
+	beginRampMotorsTask();
+	beginEncoderResetTask();
+
+	while (1) {
+		if (digitalRead(1) == LOW)
+			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+		if (digitalRead(2) == LOW)
+			modFlywheelSpeed = 65;
+
+		// Flipping the value of switch bool
+		if(digitalRead(3) == LOW)
+			switch3 = !switch3;
+
+		// If switch3 is active, turn flywheels, if not turn them off
+		if (switch3)
+			rampMotorsUp(modFlywheelSpeed);
+		else
+			rampMotorsDown(0);
+
+		printf("%d \n", encoderGet(LFlywheel));
+		printf("%d \n", encoderGet(RFlywheel));
+
+		delay(20);
+	}
+}
+
+// Original Operational control mode
+void opMode(){
 	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
 
 	setMotorReversed(LEFT_UP_DRIVE, true);
@@ -111,3 +161,9 @@ void operatorControl() {
 		delay(20);
 	}
 }
+
+void operatorControl() {
+	//debugMode();
+	//opMode();
+}
+

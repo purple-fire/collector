@@ -34,6 +34,9 @@
 
 #include "main.h"
 
+Encoder LFlywheel;
+Encoder RFlywheel;
+
 /*
  * Runs pre-initialization code. This function will be started in kernel mode one time while the
  * VEX Cortex is starting up. As the scheduler is still paused, most API functions will fail.
@@ -43,6 +46,10 @@
  * configure a UART port (usartOpen()) but cannot set up an LCD (lcdInit()).
  */
 void initializeIO() {
+	pinMode(1, INPUT);
+	pinMode(2, INPUT);
+	pinMode(3, INPUT);
+	pinMode(4, INPUT);
 }
 
 /*
@@ -59,4 +66,6 @@ void initializeIO() {
  * can be implemented in this task if desired.
  */
 void initialize() {
+	LFlywheel = encoderInit(5,6,false);
+	RFlywheel = encoderInit(7,8,false);
 }

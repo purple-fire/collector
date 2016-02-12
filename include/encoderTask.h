@@ -11,10 +11,21 @@
 #include <API.h>
 
 Encoder encoders[4];
-void setupEncoder(Encoder encoder, int index);
+int DELAY_TIME = 10;
+void setupEncoder(Encoder encoder, int channel);
 void resetEncoders();
-void beginEncoderResetTask();
+int getSensorValue(int channel);
+void beginEncoderTask();
 
-TaskHandle encoderResetTask;
+int leftEncoderSpeed = 0;
+int rightEncoderSpeed = 0;
+
+int getLeftSpeed();
+int getRightSpeed();
+void leftSpeedTask();
+void rightSpeedTask();
+
+TaskHandle speedHandleLeft;
+TaskHandle speedHandleRight;
 
 #endif /* ENCODERTASK_H_ */

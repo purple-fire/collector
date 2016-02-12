@@ -74,3 +74,71 @@ void rampMotors(){
 		}
 	}
 }
+
+void setLeftFlywheelMotor(unsigned char channel, bool flywheel){
+	motorLeftFlywheel[channel-1] = flywheel;
+}
+
+void setRightFlywheelMotor(unsigned char channel, bool flywheel){
+	motorRightFlywheel[channel-1] = flywheel;
+}
+
+void setFlywheelTarget(int target){
+	flywheelTarget = target;
+}
+
+void stopFlywheels(){
+	flywheelTarget = 0;
+}
+
+void beginFlywheelControlTask(){
+	flywheelTask = taskRunLoop(flywheelRamp, 10);
+}
+void flywheelRamp(){
+	int leftEncoder = getLeftSpeed();
+	int rightEncoder = getRightSpeed();
+
+	if (leftEncoder < flywheelTarget && abs(flywheelTarget - leftEncoder) > 1){
+		if (++leftSpeed > 127) leftSpeed = 127;
+
+		for (int i = 0; i < 12; i++)
+			if (motorLeftFlywheel[i])
+				setMotorSpeed(i, leftSpeed);
+	}
+	else if (leftEncoder > flywheelTarget && abs(flywheelTarget - leftEncoder) > 1){
+		if (--leftSpeed < 0) leftSpeed = 0;
+
+		for (int i = 0; i < 12; i++)
+			if (motorLeftFlywheel[i])
+				setMotorSpeed(i, leftSpeed);
+	}
+	else{
+		for (int i = 0; i < 12; i++)
+			if (motorLeftFlywheel[i])
+				setMotorSpeed(i, leftSpeed);
+	}
+
+
+
+	if (rightEncoder < flywheelTarget && abs(flywheelTarget - rightEncoder) > 1){
+		if (++rightSpeed > 127) rightSpeed = 127;
+
+		for (int i = 0; i < 12; i++)
+			if (motorRightFlywheel[i])
+				setMotorSpeed(i, rightSpeed);
+	}
+	else if(rightEncoder > flywheelTarget && abs(flywheelTarget - rightEncoder) > 1){
+		if (--rightSpeed < 0) rightSpeed = 0;
+		printf("Right Speed is: %d", rightSpeed);
+
+		for (int i = 0; i < 12; i++)
+			if (motorRightFlywheel[i])
+				setMotorSpeed(i, rightSpeed);
+	}
+	else{
+		for (int i = 0; i < 12; i++)
+			if (motorRightFlywheel[i])
+				setMotorSpeed(i, rightSpeed);
+	}
+}
+

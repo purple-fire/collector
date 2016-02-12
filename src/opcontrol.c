@@ -35,9 +35,9 @@
 #include "main.h"
 #include "motorControl.c"
 #include <Math.h>
-#include "encoderTask.c"
 
-const int MAX_FLYWHEEL_SPEED = 127;
+//const int MAX_FLYWHEEL_SPEED = 127;
+const int MAX_FLYWHEEL_SPEED = 10;
 const int MAX_PICKUP_SPEED = 127;
 const int MAX_RELEASE_SPEED = -127;
 
@@ -78,8 +78,7 @@ void initialize() {
  * At 32 flywheels spin at ~ 200 for right flywheel and 400 for left flywheel
  */
 void debugMode(){
-	bool switch3 = false;
-	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+	modFlywheelSpeed = 10;
 
 	setMotorReversed(LEFT_UP_DRIVE, true);
 	setMotorReversed(LEFT_DOWN_DRIVE, true);
@@ -87,38 +86,38 @@ void debugMode(){
 	setMotorReversed(LEFT_FLY_BOTTOM, true);
 	setMotorReversed(RIGHT_FLY_TOP, true);
 
-	setMotorToRamp(LEFT_FLY_TOP, true);
-	setMotorToRamp(LEFT_FLY_BOTTOM, true);
-	setMotorToRamp(RIGHT_FLY_TOP, true);
-	setMotorToRamp(RIGHT_FLY_BOTTOM, true);
+	setLeftFlywheelMotor(LEFT_FLY_TOP, true);
+	setLeftFlywheelMotor(LEFT_FLY_BOTTOM, true);
+	setRightFlywheelMotor(RIGHT_FLY_TOP, true);
+	setRightFlywheelMotor(RIGHT_FLY_BOTTOM, true);
 
 	setupEncoder(LFlywheel, 1);
 	setupEncoder(RFlywheel, 2);
 
-	beginRampMotorsTask();
-	beginEncoderResetTask();
+	beginEncoderTask();
+	beginFlywheelControlTask();
+	//beginEncoderResetTask();
 
 	while (1) {
 		if (digitalRead(1) == LOW)
-			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
+			//modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
 
-		if (digitalRead(2) == LOW)
-			modFlywheelSpeed = 65/2;
+		if (digitalRead(2) == LOW){}
+			//modFlywheelSpeed = MAX_FLYWHEEL_SPEED / 2;
 
-		// Flipping the value of switch bool
-		if(digitalRead(3) == LOW)
-			switch3 = !switch3;
 
 		// If switch3 is active, turn flywheels, if not turn them off
-		if (switch3)
-			rampMotorsUp(modFlywheelSpeed);
+		if (digitalRead(3) == LOW)
+		{
+			setFlywheelTarget(modFlywheelSpeed);
+			print("Got here!");
+		}
 		else
-			rampMotorsDown(0);
+			stopFlywheels();
 
-		printf("\n%d", encoderGet(LFlywheel));
-		printf("\n%d", encoderGet(RFlywheel));
+		//printf("Encoder Left: %d, Speed: %d\n\rEncoder Right: %d, Speed: %d\n\r modFlywheelSpeed: %d\n\r", getLeftSpeed(), leftSpeed, getRightSpeed(), rightSpeed, modFlywheelSpeed);
 
-		delay(20);
+		delay(500);
 	}
 }
 
@@ -156,6 +155,10 @@ void opMode(){
 		setMotorSpeed(RIGHT_UP_DRIVE, rightStick);
 		setMotorSpeed(RIGHT_DOWN_DRIVE, rightStick);
 
+		// if both buttons on the front are pressed
+		if(digitalRead(1) == LOW && digitalRead(2) == LOW)
+			modFlywheelSpeed = 45;
+
 		if (button6U)
 			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
 		else if (button6D)
@@ -172,16 +175,18 @@ void opMode(){
 			digitalWrite(1, LOW);
 			rampMotorsUp(modFlywheelSpeed);
 		}
-		else{
-			rampMotorsDown(0);
+		else if (button5U){
+
 		}
+		else
+			rampMotorsDown(0);
 
 		delay(20);
 	}
 }
 
 void operatorControl() {
-	//debugMode();
-	opMode();
+	debugMode();
+	//opMode();
 }
 

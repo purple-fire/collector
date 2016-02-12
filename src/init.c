@@ -35,9 +35,6 @@
 #include "main.h"
 #include <API.h>
 
-Encoder LFlywheel;
-Encoder RFlywheel;
-
 /*
  * Runs pre-initialization code. This function will be started in kernel mode one time while the
  * VEX Cortex is starting up. As the scheduler is still paused, most API functions will fail.

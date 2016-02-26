@@ -17,11 +17,11 @@ void resetEncoders();
 int getSensorValue(int channel);
 void beginEncoderTask();
 
-int leftEncoderSpeed = 0;
-int rightEncoderSpeed = 0;
-
-int getLeftSpeed();
-int getRightSpeed();
+float leftEncoderSpeed = 0;
+float rightEncoderSpeed = 0;
+float CONVERT_TO_RPM = 60*1000/360;
+float getLeftSpeed();
+float getRightSpeed();
 void leftSpeedTask();
 void rightSpeedTask();
 

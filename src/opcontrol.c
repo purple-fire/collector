@@ -66,19 +66,82 @@ void initializeIO() {
 }
 
 void initialize() {
-	LFlywheel = encoderInit(5,6,false);
-	RFlywheel = encoderInit(7,8,true);
+	LFlywheel = encoderInit(5, 6, false);
+	RFlywheel = encoderInit(7, 8, true);
+	modFlywheelSpeed = 1250;
+
+	setMotorReversed(LEFT_UP_DRIVE, true);
+	setMotorReversed(LEFT_DOWN_DRIVE, true);
+
+	setMotorReversed(LEFT_FLY_BOTTOM, true);
+	setMotorReversed(RIGHT_FLY_TOP, true);
+
+	setLeftFlywheelMotor(LEFT_FLY_TOP, true);
+	setLeftFlywheelMotor(LEFT_FLY_BOTTOM, true);
+	setRightFlywheelMotor(RIGHT_FLY_TOP, true);
+	setRightFlywheelMotor(RIGHT_FLY_BOTTOM, true);
 }
 
+void opMode() {
 
-// Debug mode for testing the accuracy of the encoders and their values
-/* NOTE:
- * Flywheel speed for motors at 127 power reads ~1000 to 1100 / 100ms
- * At 65 flywheels spin at ~ 500 to 600 / 100ms
- * At 32 flywheels spin at ~ 200 for right flywheel and 400 for left flywheel
- */
-void debugMode(){
-	modFlywheelSpeed = 10;
+
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
+
+	beginEncoderTask();
+	beginFlywheelControlTask();
+
+	while (1) {
+
+		int button5U = joystickGetDigital(1, 5, JOY_UP);
+		int button6U = joystickGetDigital(1, 6, JOY_UP);
+		int button6D = joystickGetDigital(1, 6, JOY_DOWN);
+
+		int button7U = joystickGetDigital(1, 7, JOY_UP);
+		int button7D = joystickGetDigital(1, 7, JOY_DOWN);
+
+		int leftStick = joystickGetAnalog(1, 3);
+		int rightStick = joystickGetAnalog(1, 2);
+
+		setMotorSpeed(LEFT_UP_DRIVE, leftStick);
+		setMotorSpeed(LEFT_DOWN_DRIVE, leftStick);
+
+		setMotorSpeed(RIGHT_UP_DRIVE, rightStick);
+		setMotorSpeed(RIGHT_DOWN_DRIVE, rightStick);
+
+		// If switch3 is active, turn flywheels, if not turn them off
+		if (digitalRead(3) == LOW) {
+			setFlywheelTarget(modFlywheelSpeed);
+		} else
+			stopFlywheels();
+
+		// if both buttons on the front are pressed
+		if (digitalRead(1) == LOW && digitalRead(2) == LOW)
+			modFlywheelSpeed = 1000;
+
+		if (button6U)
+			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
+		else if (button6D)
+			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
+		else
+			setMotorSpeed(PICKUP_BELT, 0);
+
+		if (button7U)
+			modFlywheelSpeed = 1650;
+		if (button7D)
+			modFlywheelSpeed = 1200;
+
+		if (button5U)
+			setFlywheelTarget(modFlywheelSpeed);
+		else
+			stopFlywheels();
+
+		delay(10);
+	}
+}
+
+void debugMode() {
+	modFlywheelSpeed = 1250;
 
 	setMotorReversed(LEFT_UP_DRIVE, true);
 	setMotorReversed(LEFT_DOWN_DRIVE, true);
@@ -99,94 +162,57 @@ void debugMode(){
 	//beginEncoderResetTask();
 
 	while (1) {
-		if (digitalRead(1) == LOW)
-			//modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
-
-		if (digitalRead(2) == LOW){}
-			//modFlywheelSpeed = MAX_FLYWHEEL_SPEED / 2;
-
 
 		// If switch3 is active, turn flywheels, if not turn them off
-		if (digitalRead(3) == LOW)
-		{
+		if (digitalRead(3) == LOW) {
 			setFlywheelTarget(modFlywheelSpeed);
-			print("Got here!");
-		}
-		else
+		} else
 			stopFlywheels();
 
-		//printf("Encoder Left: %d, Speed: %d\n\rEncoder Right: %d, Speed: %d\n\r modFlywheelSpeed: %d\n\r", getLeftSpeed(), leftSpeed, getRightSpeed(), rightSpeed, modFlywheelSpeed);
+		if (digitalRead(2) == LOW) {
+			modFlywheelSpeed = 1500;
+		} else {
+			modFlywheelSpeed = 1250;
+		}
 
-		delay(500);
-	}
-}
-
-// Original Operational control mode
-void opMode(){
-	modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
-
-	setMotorReversed(LEFT_UP_DRIVE, true);
-	setMotorReversed(LEFT_DOWN_DRIVE, true);
-
-	setMotorReversed(LEFT_FLY_BOTTOM, true);
-	setMotorReversed(RIGHT_FLY_TOP, true);
-
-	setMotorToRamp(LEFT_FLY_TOP, true);
-	setMotorToRamp(LEFT_FLY_BOTTOM, true);
-	setMotorToRamp(RIGHT_FLY_TOP, true);
-	setMotorToRamp(RIGHT_FLY_BOTTOM, true);
-
-	beginRampMotorsTask();
-
-	while (1) {
-		int button5U = joystickGetDigital(1,5,JOY_UP);
-		int button6U = joystickGetDigital(1,6,JOY_UP);
-		int button6D = joystickGetDigital(1,6,JOY_DOWN);
-
-		int button7U = joystickGetDigital(1,7,JOY_UP);
-		int button7D = joystickGetDigital(1,7,JOY_DOWN);
-
-		int leftStick = joystickGetAnalog(1, 3);
-		int rightStick = joystickGetAnalog(1, 2);
-
-		setMotorSpeed(LEFT_UP_DRIVE, leftStick);
-		setMotorSpeed(LEFT_DOWN_DRIVE, leftStick);
-
-		setMotorSpeed(RIGHT_UP_DRIVE, rightStick);
-		setMotorSpeed(RIGHT_DOWN_DRIVE, rightStick);
-
-		// if both buttons on the front are pressed
-		if(digitalRead(1) == LOW && digitalRead(2) == LOW)
-			modFlywheelSpeed = 45;
-
-		if (button6U)
-			setMotorSpeed(PICKUP_BELT, -MAX_PICKUP_SPEED);
-		else if (button6D)
-			setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
-		else
+		if (digitalRead(1) == LOW) {
+			setMotorSpeed(PICKUP_BELT, -127);
+			setFlywheelTarget(modFlywheelSpeed);
+		} else {
 			setMotorSpeed(PICKUP_BELT, 0);
-
-		if (button7U)
-			modFlywheelSpeed = MAX_FLYWHEEL_SPEED;
-		if (button7D)
-			modFlywheelSpeed = 65;
-
-		if(button5U){
-			digitalWrite(1, LOW);
-			rampMotorsUp(modFlywheelSpeed);
+			stopFlywheels();
 		}
-		else if (button5U){
 
-		}
-		else
-			rampMotorsDown(0);
+		printf("Encoder Left: %4.2f, Speed: %d\n\rEncoder Right: %4.2f, Speed: %d\n\r", getLeftSpeed(), leftSpeed, getRightSpeed(), rightSpeed);
 
-		delay(20);
+		delay(10);
 	}
 }
 
+void autonomous(){
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
+
+	beginEncoderTask();
+	beginFlywheelControlTask();
+
+	setFlywheelTarget(1650);
+	setMotorSpeed(PICKUP_BELT, MAX_PICKUP_SPEED);
+	delay(20000);
+}
+
+void skills(){
+	setupEncoder(LFlywheel, 1);
+	setupEncoder(RFlywheel, 2);
+
+	beginEncoderTask();
+	beginFlywheelControlTask();
+
+	setFlywheelTarget(1550);
+	setMotorSpeed(10, -127);
+}
 void operatorControl() {
-	debugMode();
-	//opMode();
+	//debugMode();
+	driving();
 }
 

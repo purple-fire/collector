@@ -21,6 +21,12 @@ int rampDownDelay = 20;
 int flywheelTarget = 0;
 int leftSpeed = 0;
 int rightSpeed = 0;
+int ENC_TOLERANCE = 25;
+
+float pidIntegralLeft = 0;
+float pidLastErrorLeft = 0;
+float pidIntegralRight = 0;
+float pidLastErrorRight = 0;
 
 void setMotorToRamp(unsigned char channel, bool ramp);
 void setMotorReversed(unsigned char channel, bool isReversed);
@@ -30,7 +36,7 @@ void setRampDownDelay(int delay);
 void beginRampMotorsTask();
 void stopRampMotorsTask();
 
-void setMotorSpeed(unsigned char channel, int speed);
+void setMotorSpeed(unsigned int channel, int speed);
 
 void rampMotorsUp(int speed);
 void rampMotorsDown(int speed);
@@ -41,8 +47,12 @@ void setLeftFlywheelMotor(unsigned char channel, bool flywheel);
 void setRightFlywheelMotor(unsigned char channel, bool flywheel);
 void setFlywheelTarget(int target);
 void flywheelRamp();
+void encPIDControllerLeft();
+void encPIDControllerRight();
 
 TaskHandle flywheelTask;
 TaskHandle rampingTask;
+TaskHandle leftPIDTask;
+TaskHandle rightPIDTask;
 
 #endif

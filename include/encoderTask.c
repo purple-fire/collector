@@ -25,10 +25,10 @@ void beginEncoderTask(){
 	print("Beginning Encoder Task");
 }
 
-int getLeftSpeed(){
+float getLeftSpeed(){
 	return abs(leftEncoderSpeed);
 }
-int getRightSpeed(){
+float getRightSpeed(){
 	return abs(rightEncoderSpeed);
 }
 
@@ -36,18 +36,19 @@ int getSensorValue(int channel){
 	return encoderGet(encoders[channel-1]);
 }
 
+//Encoder tick speed per 1ms
 void leftSpeedTask(){
 	encoderReset(encoders[0]);
-	for (int i = 1; i < 500; i++){
-		leftEncoderSpeed = getSensorValue(1) / i;
+	for (float i = 1; i < 250; i++){
+		leftEncoderSpeed = (float) getSensorValue(1) / i * CONVERT_TO_RPM;
 		delay(1);
 	}
 }
 
 void rightSpeedTask(){
 	encoderReset(encoders[1]);
-	for (int i = 1; i < 500; i++){
-		rightEncoderSpeed = getSensorValue(2) / i;
+	for (float i = 1; i < 250; i++){
+		rightEncoderSpeed = (float) getSensorValue(2) / i * CONVERT_TO_RPM;
 		delay(1);
 	}
 }
